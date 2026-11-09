@@ -1,3 +1,4 @@
+import { Leaderboard } from './leaderboard';
 import { RestaurantRoom } from './view/restaurantRoom';
 import { Vector3 } from 'three';
 import { GameAudio } from './audio';
@@ -123,6 +124,8 @@ export class Game {
   private frameMs = 16;
   /** The restaurant room, made the first time its window opens. */
   private room: RestaurantRoom | null = null;
+  /** The online leaderboard (joining is the player's choice). */
+  private board = new Leaderboard();
   private quality: Quality;
   private guideTips = loadGuideTips(localStorage);
   private guideCards!: GuideCards;
@@ -208,7 +211,10 @@ export class Game {
         resume: () => this.resume(),
         toTitle: () => this.toTitle(),
         onClose: () => this.audio.click(),
-        onOpen: (kind) => { if (kind === 'board') noteBoardOpened(this.state); },
+        onOpen: (kind) => { if (kind === 'board') noteBoardOpened(this.state); if (kind === 'leaderboard') void this.board.refresh(); },
+        getBoard: () => ({ joined: this.board.joined, name: this.board.profile?.name ?? '', view: this.board.view }),
+        joinBoard: (name) => { this.board.join(name, this.state.lifetime, this.state.clock); },
+        refreshBoard: () => { void this.board.refresh(); },
         getConsent: () => consentStatus(),
         setConsent: (on) => setConsent(on),
         getGuideTips: () => this.guideTips,
@@ -512,6 +518,7 @@ export class Game {
     else this.rig.render();
 
     // ui
+    if (this.mode === 'play') this.board.tick(s.lifetime, s.clock, performance.now());
     this.hud.update(s, promptFor(s, this.target));
     this.panels.update();
   }

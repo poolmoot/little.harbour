@@ -26,6 +26,7 @@ export const titleScreen: Screen = ({ state: s, hasSave, confirmNew, consent }) 
     hasSave ? `${button({ label: MENU.continueGame, act: 'continue', tone: 'go', size: 'lg', wide: true })}<div class="menu-save">${MENU.saveLine(s.day, money(s.money))}</div>` : '',
     button({ label: MENU.newGame, act: 'newgame', tone: hasSave ? 'gold' : 'go', size: 'lg', wide: true }),
     `<div class="menu-row">${[
+      button({ label: `${icon('star', 18)}${MENU.leaderboard}`, act: 'leaderboard', tone: 'gold', size: 'sm' }),
       button({ label: `${icon('gear', 18)}${MENU.settings}`, act: 'settings', tone: 'info', size: 'sm' }),
       button({ label: `${icon('help', 18)}${MENU.howToPlay}`, act: 'howto', tone: 'info', size: 'sm' }),
       button({ label: `${icon('note', 18)}${GUIDE.menuButton}`, act: 'tips', tone: 'info', size: 'sm' }),

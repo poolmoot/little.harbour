@@ -1,3 +1,4 @@
+import type { BoardView } from '../../leaderboard';
 import type { Consent } from '../../analytics';
 import type { AudioSettings } from '../../audio/settings';
 import type { DayStats, GameState } from '../../sim/state';
@@ -5,6 +6,9 @@ import type { QualityMode } from '../../view/quality';
 
 /** What the welcome-back window shows (the sim's AwayResult). */
 export interface AwayInfo { seconds: number; earned: number; perMinute: number }
+
+/** What the leaderboard page needs: has the player joined, their name, and the board as last fetched. */
+export interface BoardInfo { joined: boolean; name: string; view: BoardView }
 
 export interface TabDef { id: string; label: string }
 
@@ -29,6 +33,8 @@ export interface ScreenCtx {
   away?: AwayInfo | null;
   /** The answer about counting play: not asked yet, yes, no, or 'none' when counting is not available. */
   consent?: Consent;
+  /** The online leaderboard (leaderboard page). */
+  board?: BoardInfo;
   /** The Show guide tips switch. */
   guideTips?: boolean;
   /** Seconds since this window opened (lets a number count up). */

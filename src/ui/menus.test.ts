@@ -1,3 +1,5 @@
+import { leaderboardScreen } from './screens/leaderboard';
+import { BOARD_TEXT } from './menuText';
 import { describe, expect, it } from 'vitest';
 import { DEFAULT_SETTINGS } from '../audio/settings';
 import { initialState } from '../sim/sim';
@@ -17,7 +19,7 @@ const acts = (html: string) => [...html.matchAll(/data-act="([a-z-]+)"/g)].map((
 
 describe('title screen', () => {
   it('offers New game, Settings and How to play, but not Continue, without a save', () => {
-    expect(acts(titleScreen(ctx()).body)).toEqual(['newgame', 'settings', 'howto', 'tips', 'privacy', 'terms']);
+    expect(acts(titleScreen(ctx()).body)).toEqual(['newgame', 'leaderboard', 'settings', 'howto', 'tips', 'privacy', 'terms']);
   });
 
   it('offers Continue first, with the day and money, when a save exists', () => {
@@ -25,7 +27,7 @@ describe('title screen', () => {
     state.day = 4;
     state.money = 1234;
     const v = titleScreen(ctx({ state, hasSave: true }));
-    expect(acts(v.body)).toEqual(['continue', 'newgame', 'settings', 'howto', 'tips', 'privacy', 'terms']);
+    expect(acts(v.body)).toEqual(['continue', 'newgame', 'leaderboard', 'settings', 'howto', 'tips', 'privacy', 'terms']);
     expect(v.body).toContain('Day 4');
     expect(v.body).toContain('$1,234');
   });
@@ -45,7 +47,7 @@ describe('title screen', () => {
 describe('pause menu', () => {
   it('has Resume, Settings, How to play and Back to title', () => {
     const v = pauseScreen(ctx());
-    expect(acts(v.body)).toEqual(['resume', 'settings', 'howto', 'tips', 'totitle']);
+    expect(acts(v.body)).toEqual(['resume', 'leaderboard', 'settings', 'howto', 'tips', 'totitle']);
     expect(v.menu).toBe(true);
   });
 });
@@ -115,7 +117,7 @@ describe('fish book and hints', () => {
 describe('play data choice', () => {
   it('asks on the title screen only while unanswered, with two equal buttons', () => {
     const asked = titleScreen(ctx({ consent: 'pending' })).body;
-    expect(acts(asked)).toEqual(['newgame', 'settings', 'howto', 'tips', 'consent-yes', 'consent-no', 'privacy', 'terms']);
+    expect(acts(asked)).toEqual(['newgame', 'leaderboard', 'settings', 'howto', 'tips', 'consent-yes', 'consent-no', 'privacy', 'terms']);
     expect(acts(titleScreen(ctx({ consent: 'granted' })).body)).not.toContain('consent-yes');
     expect(acts(titleScreen(ctx({ consent: 'none' })).body)).not.toContain('consent-no');
   });
@@ -124,5 +126,22 @@ describe('play data choice', () => {
     expect(acts(settingsScreen(ctx({ consent: 'granted' })).body)).toContain('consent');
     expect(acts(settingsScreen(ctx({ consent: 'denied' })).body)).toContain('consent');
     expect(acts(settingsScreen(ctx({ consent: 'none' })).body)).not.toContain('consent');
+  });
+});
+
+describe('leaderboard page', () => {
+  const view = { status: 'ok' as const, rows: [{ rank: 1, name: 'Rich Port', earned: 9000 }, { rank: 2, name: 'Sunny Bay', earned: 300, you: true }], me: { rank: 2, name: 'Sunny Bay', earned: 300, you: true }, total: 2 };
+  it('asks for a name first, then shows the richest harbours with yours marked', () => {
+    const join = leaderboardScreen(ctx({ board: { joined: false, name: '', view: { status: 'idle', rows: [], me: null, total: 0 } } }));
+    expect(acts(join.body)).toContain('joinboard');
+    const board = leaderboardScreen(ctx({ board: { joined: true, name: 'Sunny Bay', view } })).body;
+    expect(board).toContain('Rich Port');
+    expect(board).toContain('9,000');
+    expect(board).toContain('lb-row you');
+    expect(board).toContain(BOARD_TEXT.yourPlace(2, 2));
+  });
+  it('says so when the leaderboard cannot be reached', () => {
+    const v = leaderboardScreen(ctx({ board: { joined: true, name: 'Sunny Bay', view: { status: 'error', rows: [], me: null, total: 0 } } }));
+    expect(v.body).toContain(BOARD_TEXT.error);
   });
 });

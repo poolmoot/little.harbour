@@ -1,19 +1,21 @@
 // Names: the harbour and each boat.
 import { NAME_MAX, NAME_MIN, NAME_PATTERN } from './config';
 import type { Ev, GameState } from './state';
+import { isRudeName } from './rude';
 
-export interface NameCheck { ok: boolean; name?: string; problem?: 'empty' | 'long' | 'chars' }
+export interface NameCheck { ok: boolean; name?: string; problem?: 'empty' | 'long' | 'chars' | 'rude' }
 
-/** Trim and check a name: 1 to 16 characters, letters, digits, spaces and simple marks (' . , ! & -). */
+/** Trim and check a name: 1 to 16 characters, letters, digits, spaces and simple marks (' . , ! & -), and no rude words. */
 export function checkName(raw: string): NameCheck {
   const name = String(raw ?? '').trim();
   if (name.length < NAME_MIN) return { ok: false, problem: 'empty' };
   if ([...name].length > NAME_MAX) return { ok: false, problem: 'long' };
   if (!NAME_PATTERN.test(name)) return { ok: false, problem: 'chars' };
+  if (isRudeName(name)) return { ok: false, problem: 'rude' };
   return { ok: true, name };
 }
 
-const REASON = { empty: 'Please type a name.', long: 'That name is too long.', chars: 'That name has letters that are not allowed.' };
+const REASON = { empty: 'Please type a name.', long: 'That name is too long.', chars: 'That name has letters that are not allowed.', rude: 'That name is not allowed. Please pick a kind one.' };
 
 export function setHarbourName(state: GameState, raw: string): Ev[] {
   const c = checkName(raw);

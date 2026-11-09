@@ -19,6 +19,8 @@ import { helpScreen, tipsScreen, welcomeScreen } from './screens/guide';
 import type { Consent } from '../analytics';
 import { howtoScreen } from './screens/howto';
 import { privacyScreen, termsScreen } from './screens/legal';
+import { leaderboardScreen } from './screens/leaderboard';
+import type { BoardInfo } from './screens/types';
 import { plotScreen } from './screens/plot';
 import { pauseScreen } from './screens/pause';
 import { settingsScreen } from './screens/settings';
@@ -26,7 +28,7 @@ import { shipyardScreen } from './screens/shipyard';
 import { titleScreen } from './screens/title';
 import type { AwayInfo, Screen, ScreenView } from './screens/types';
 
-export type PanelKind = 'boat' | 'hire' | 'market' | 'shipyard' | 'board' | 'logbook' | 'summary' | 'title' | 'pause' | 'settings' | 'howto' | 'plot' | 'ending' | 'away' | 'welcome' | 'help' | 'tips' | 'berth' | 'privacy' | 'terms';
+export type PanelKind = 'boat' | 'hire' | 'market' | 'shipyard' | 'board' | 'logbook' | 'summary' | 'title' | 'pause' | 'settings' | 'howto' | 'plot' | 'ending' | 'away' | 'welcome' | 'help' | 'tips' | 'berth' | 'privacy' | 'terms' | 'leaderboard';
 
 const SCREENS: Record<PanelKind, Screen> = {
   boat: boatScreen,
@@ -41,6 +43,7 @@ const SCREENS: Record<PanelKind, Screen> = {
   settings: settingsScreen,
   howto: howtoScreen,
   privacy: privacyScreen,
+  leaderboard: leaderboardScreen,
   terms: termsScreen,
   plot: plotScreen,
   ending: endingScreen,
@@ -66,6 +69,9 @@ export interface PanelActions {
   /** Build a building, or upgrade it. */
   build(id: BuildingId): void;
   buildProject(id: ProjectId): void;
+  getBoard(): BoardInfo;
+  joinBoard(name: string): void;
+  refreshBoard(): void;
   upgradeRest(track: RestTrack): void;
   smokeIn(crateId: number): void;
   smokeOut(crateId: number): void;
@@ -231,7 +237,7 @@ export class Panels {
 
   /** Leave settings or how to play for the screen that opened it. */
   back(): void {
-    if (this.kind === 'settings' || this.kind === 'howto' || this.kind === 'tips' || this.kind === 'privacy' || this.kind === 'terms') this.open(this.returnTo);
+    if (this.kind === 'settings' || this.kind === 'howto' || this.kind === 'tips' || this.kind === 'privacy' || this.kind === 'terms' || this.kind === 'leaderboard') this.open(this.returnTo);
   }
 
   toggle(kind: PanelKind): void {
@@ -295,6 +301,7 @@ export class Panels {
     switch (act) {
       case 'renameboat': this.actions.renameBoat(Number(a), typed); return;
       case 'renameharbour': this.actions.setHarbourName(typed); return;
+      case 'joinboard': this.actions.joinBoard(typed); return;
     }
     switch (act) {
       case 'close': this.close(); break;
@@ -313,6 +320,7 @@ export class Panels {
       case 'openboat': this.open('boat', Number(a)); break;
       case 'build': this.actions.build(a as BuildingId); break;
       case 'project': this.actions.buildProject(a as ProjectId); break;
+      case 'boardrefresh': this.actions.refreshBoard(); break;
       case 'restup': this.actions.upgradeRest(a as RestTrack); break;
       case 'smokein': this.actions.smokeIn(Number(a)); break;
       case 'smokeout': this.actions.smokeOut(Number(a)); break;
@@ -325,7 +333,7 @@ export class Panels {
       case 'reset': this.confirmReset = true; this.render(true); break;
       case 'resetno': this.confirmReset = false; this.render(true); break;
       case 'resetyes': this.actions.resetGame(); break;
-      case 'settings': case 'howto': case 'tips': case 'privacy': case 'terms':
+      case 'settings': case 'howto': case 'tips': case 'privacy': case 'terms': case 'leaderboard':
         this.returnTo = this.kind === 'pause' ? 'pause' : 'title';
         this.open(act);
         break;
@@ -363,7 +371,7 @@ export class Panels {
     this.lastUpdate = performance.now() / 1000;
     const view = SCREENS[this.kind]({
       state: this.getState(), arg: this.arg, tab: this.tab, confirmReset: this.confirmReset, quality: this.actions.getQuality(), summary: this.summary,
-      hasSave: this.actions.hasSave(), guideTips: this.actions.getGuideTips(), consent: this.actions.getConsent(), confirmNew: this.confirmNew, audio: this.actions.getAudio(),
+      hasSave: this.actions.hasSave(), guideTips: this.actions.getGuideTips(), consent: this.actions.getConsent(), board: this.kind === 'leaderboard' ? this.actions.getBoard() : undefined, confirmNew: this.confirmNew, audio: this.actions.getAudio(),
       away: this.kind === 'away' ? this.actions.getAway() : null, age: (performance.now() - this.openedAt) / 1000,
     });
     const html = frame(view);

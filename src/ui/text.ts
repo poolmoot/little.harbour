@@ -369,6 +369,7 @@ export const NAME_PROBLEM: Record<string, string> = {
   empty: 'Please type a name.',
   long: 'That name is too long. Use 16 letters or fewer.',
   chars: 'Please use only letters, numbers and spaces.',
+  rude: 'That name is not allowed. Please pick a kind one.',
   nothing: 'That boat is not here.',
 };
 export const NAME_LABEL = { harbour: 'Harbour name', boat: 'Boat name', save: 'Save name', rename: 'Rename' };

@@ -44,3 +44,13 @@
 .menu-row .btn .ic { margin: 0 4px 2px 0; vertical-align: middle; }
 .consent { margin-top: 12px; }
 .menu-legal { margin-top: 8px; }
+
+/* The online leaderboard. */
+.lb-line { margin: 6px 0 10px; font-weight: var(--w-body); }
+.lb-list { display: flex; flex-direction: column; gap: 4px; max-height: 46vh; overflow-y: auto; }
+.lb-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 6px 10px; border-radius: var(--r-sm, 8px); background: rgba(0, 0, 0, 0.18); }
+.lb-row.you { background: linear-gradient(#ffe27a, #f6b73c); color: #3a2400; }
+.lb-rank { font-size: 18px; text-align: center; }
+.lb-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 800; }
+.lb-you { font-size: 12px; padding: 1px 6px; border-radius: 6px; background: #3a2400; color: #ffe27a; margin-left: 4px; }
+.lb-money { display: flex; align-items: center; gap: 4px; }

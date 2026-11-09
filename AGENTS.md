@@ -12,8 +12,10 @@ the market before they spoil, and profit is spent on better boats, more
 boats, captains and workers. The player walks around the harbour with an
 angled, looking-down camera.
 
-Stack: Three.js, Vite, TypeScript (strict), Vitest. One dependency (`three`).
-No backend. Progress saves to the browser's `localStorage`.
+Stack: Three.js, Vite, TypeScript (strict), Vitest. Game dependency: `three`.
+Progress saves to the browser's `localStorage`. The only server part is the opt-in online
+leaderboard: one Vercel edge function (`api/leaderboard.ts`, uses `@vercel/blob`) storing one
+private file in Vercel Blob. The game works fully without it.
 
 ## The owner
 
@@ -215,6 +217,8 @@ In `docs/superpowers/specs/`, oldest first:
    upgrade levels, prices shown in money, the easier start and the bigger dock crates.
 8. `2026-10-28-restaurant-and-big-ships-design.md` — dearer carts and ships, boat sizes up
    to 9, the restaurant's four upgrades and its live 3D room.
+10. `2026-11-09-leaderboard-design.md` — the opt-in online leaderboard (richest harbours),
+   player names with the rude-word filter, how scores are checked and stored.
 9. `2026-11-09-deeper-places-design.md` — four deeper places for the big ships (Cold North
    Sea, Dark Deep, Sunken Wreck, The Trench), twelve new fish, the King Fish deeper too.
 
@@ -259,6 +263,7 @@ game bundle); `docs/superpowers/specs/` design notes.
 - `events.ts` — turns sim events into sounds, toasts, pop-ups and saves; also sets the rain, storm-wind and fog sound layers from the weather.
 - `interaction.ts` — what is near the player, the prompt text, and what E does (including the three plot doors and the empty boat spots on the pier, which open the `berth` window, and delivering the King Fish at the inn).
 - `debug.ts` — dev-only `window.__debug` helpers (never in production builds).
+- `leaderboard.ts` — the game's side of the online leaderboard: the player's name and random id (own `localStorage` key), fetching the board, sending the score now and then. The server is `api/leaderboard.ts` at the root (not under `src/`).
 - `input.ts` — keyboard state (a text field owns every key; sliders keep their own arrow keys; `keyBelongsToField` is tested).
 - `palette.ts` — fish colours shared by view and UI.
 
@@ -294,7 +299,8 @@ game bundle); `docs/superpowers/specs/` design notes.
 - `income.ts` — money earned per minute.
 - `away.ts` — earnings while the player is away (measures a rate on a copy, credits half of it).
 - `fishbook.ts` — fish sizes, stars, golden fish, the fish book figures and zone rewards.
-- `names.ts` — harbour and boat names and their checks.
+- `names.ts` — harbour and boat names and their checks (with `rude.ts`, the rude-word filter for every typed name).
+- `board.ts` — the leaderboard rules shared with the server: player names, checking a sent score, keeping and ranking the file.
 - `guide.ts` — the starting guide: steps, unlock cards, the gentle first minutes (saved in `state.guide`). `guideAdvice.ts` — what to do instead while a step costs too much (boats sail at night too).
 - `layoutBoxes.ts` — every solid footprint in the harbour (buildings turned exactly 0 or +-90 degrees, plots, lamps, trees, terrace tables), the walkable ground (the square, the pier and the lighthouse breakwater) and the lanes that must stay clear (three walking lanes making a U round the open middle, the approach to every door, the path from the pier). One small square: sea row on top (market, pier gap, ice box, notice board, clock tower), shipyard / cold store / smokehouse down the west side, inn / restaurant down the east side, camera side open (`LAYOUT.square` in `config.ts`). The view builds its collision from it and the layout tests walk it with hard size and walking-distance limits (`layout.test.ts`, `../layoutStations.test.ts`, `../view/townLayout.test.ts`).
 

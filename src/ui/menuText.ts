@@ -12,6 +12,7 @@ export const MENU = {
   paused: 'Paused',
   settings: 'Settings',
   howToPlay: 'How to play',
+  leaderboard: 'Leaderboard',
   backToTitle: 'Back to title',
   back: 'Back',
   pauseNote: 'The game is waiting for you. Your game is saved when you go back to the title.',
@@ -75,17 +76,38 @@ export const HOWTO = {
   ] as const,
 };
 
+/** The online leaderboard page. */
+export const BOARD_TEXT = {
+  title: 'Leaderboard',
+  joinTitle: 'Join the leaderboard',
+  joinLine: 'Pick a name. Other players will see it next to the money your harbour has earned.',
+  shared: 'Only your name and the money you earned are shared.',
+  nameLabel: 'Your name',
+  join: 'Join',
+  save: 'Save',
+  changeName: 'Change your name',
+  richest: 'Richest harbours',
+  earned: 'Money earned',
+  you: 'You',
+  yourPlace: (rank: number, total: number): string => `You are number ${rank} of ${total}.`,
+  notYet: 'Your score is on its way. Look again in a minute.',
+  loading: 'Loading the leaderboard...',
+  error: 'The leaderboard cannot be reached right now. Try again later.',
+  empty: 'No harbours yet. Be the first!',
+  refresh: 'Refresh',
+};
+
 /** Privacy, terms and the data choice. Plain words, not legal language. Written to cover what the GDPR asks a privacy notice to say. */
 const CONTACT = '<a href="https://github.com/poolmoot/little.harbour/issues" target="_blank" rel="noopener">our contact page on GitHub</a>';
 
 export const LEGAL = {
   privacy: 'Privacy',
   terms: 'Terms',
-  updated: 'Last updated 22 October 2026.',
+  updated: 'Last updated 9 November 2026.',
   privacyTitle: 'Privacy',
   privacyParts: [
     ['The short version', [
-      'Little Harbour has no accounts, no ads and no shop. We never ask for your name or email. Nothing about how you play is counted unless you say yes, and you can change your mind at any time in Settings.',
+      'Little Harbour has no accounts, no ads and no shop. We never ask for your email. Nothing about how you play is counted unless you say yes, and you can change your mind at any time in Settings. If you join the leaderboard, your player name and money earned are shown to other players.',
     ]],
     ['Who is responsible', [
       'Little Harbour is made by Poolmoot. We decide what is counted and why. You can reach us through ' + CONTACT + '.',
@@ -105,6 +127,12 @@ export const LEGAL = {
       '- errors and crashes, with technical details',
       '- a few game moments, like starting a game, buying a boat or reaching a new rank',
       'To tell one visit from another, a random number is kept in your browser. It is not your name and we cannot tell who you are from it. The harbour and boat names you type are not sent as counts, but they could show up in a screen recording.',
+    ]],
+    ['If you join the leaderboard', [
+      'Joining is your choice. Only if you join, these are sent to our server (run by Vercel) and shown to other players:',
+      '- the player name you pick (rude names are not allowed)',
+      '- the total money your harbour has earned',
+      'A random number kept in your browser tells your score apart from others. We keep the best 500 scores. To have your name removed, tell us through ' + CONTACT + ' with your player name.',
     ]],
     ['Why we may do this', [
       'We only do it because you agreed. That is our legal reason (your consent). If you say no, none of the above is recorded and the game works exactly the same.',

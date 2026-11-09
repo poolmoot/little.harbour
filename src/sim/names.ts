@@ -1,7 +1,8 @@
 // Names: the harbour and each boat.
-import { NAME_MAX, NAME_MIN, NAME_PATTERN } from './config';
+// The .js endings let the leaderboard server (api/leaderboard.ts, plain Node) load these files too.
+import { NAME_MAX, NAME_MIN, NAME_PATTERN } from './config.js';
 import type { Ev, GameState } from './state';
-import { isRudeName } from './rude';
+import { isRudeName } from './rude.js';
 
 export interface NameCheck { ok: boolean; name?: string; problem?: 'empty' | 'long' | 'chars' | 'rude' }
 

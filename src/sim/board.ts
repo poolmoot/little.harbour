@@ -1,7 +1,7 @@
 // The online leaderboard's rules: player names (with a rude-word filter), checking a sent score, and keeping the
 // leaderboard file in order. Pure and tested; used by the game and by the server function in api/leaderboard.ts.
-import { checkName } from './names';
-import type { NameCheck } from './names';
+import { checkName } from './names.js';
+import type { NameCheck } from './names.js';
 
 /** How many players the leaderboard file keeps, and how many it shows. */
 export const BOARD_KEEP = 500;

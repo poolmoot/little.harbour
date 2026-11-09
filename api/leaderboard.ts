@@ -1,12 +1,10 @@
-// The online leaderboard: one small server function on Vercel. GET shows the richest harbours (and where you stand);
+// The online leaderboard: one small server function on Vercel (Node.js). GET shows the richest harbours (and where you stand);
 // POST sends your harbour's total earnings. Scores live in one private file in Vercel Blob. Two players saving at once
 // cannot overwrite each other: a save only goes through if nobody changed the file since it was read, otherwise it retries.
 // The rules (names, believable scores, ranking) are shared with the game in src/sim/board.ts.
 import { BlobPreconditionFailedError, get, put } from '@vercel/blob';
-import { addScore, checkSubmission, emptyBoard, topRows } from '../src/sim/board';
-import type { BoardFile, Submission } from '../src/sim/board';
-
-export const config = { runtime: 'edge' };
+import { addScore, checkSubmission, emptyBoard, topRows } from '../src/sim/board.js';
+import type { BoardFile, Submission } from '../src/sim/board.js';
 
 const PATH = 'leaderboard/board.json';
 const json = (body: unknown, status = 200, cache = 'no-store'): Response =>
@@ -56,12 +54,11 @@ async function send(request: Request): Promise<Response> {
   return json({ error: 'busy, try again' }, 503);
 }
 
-export default async function handler(request: Request): Promise<Response> {
-  try {
-    if (request.method === 'GET') return await show(request);
-    if (request.method === 'POST') return await send(request);
-    return json({ error: 'method' }, 405);
-  } catch {
-    return json({ error: 'server' }, 500);
-  }
+// A plain Node.js function on Vercel (the Blob library needs Node), answering GET and POST.
+export async function GET(request: Request): Promise<Response> {
+  try { return await show(request); } catch { return json({ error: 'server' }, 500); }
+}
+
+export async function POST(request: Request): Promise<Response> {
+  try { return await send(request); } catch { return json({ error: 'server' }, 500); }
 }

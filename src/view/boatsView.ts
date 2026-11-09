@@ -272,7 +272,7 @@ class BoatModel {
 }
 
 const REACH = [85, 120, 150, 180];
-const SWING = [0.12, 0.3, 0.42, 0.55];
+const SWING = [0.12, 0.3, 0.42, 0.55, 0.62, 0.7, 0.78, 0.86]; // per fishing place, nearest first
 
 export class BoatsView {
   private models = new Map<number, BoatModel>();

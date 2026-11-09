@@ -67,9 +67,9 @@ describe('fish book', () => {
     s.book.herring.caught = 1;
     s.book.herring.bestStars = 3;
     const v = logbookScreen(ctx(s));
-    expect(v.body).toContain('Fish found: 1 of 12');
-    expect(v.body).toContain('Fish with 3 stars: 1 of 12');
-    expect(v.body).toContain('Golden fish found: 0 of 12');
+    expect(v.body).toContain('Fish found: 1 of 24');
+    expect(v.body).toContain('Fish with 3 stars: 1 of 24');
+    expect(v.body).toContain('Golden fish found: 0 of 24');
   });
 });
 

@@ -254,7 +254,7 @@ export interface Check {
   needHull?: number; // set when only a bigger boat is missing (Boat size level)
 }
 
-export const STATE_VERSION = 10;
+export const STATE_VERSION = 11;
 
 function perSpecies<T>(f: () => T): Record<Species, T> {
   const o = {} as Record<Species, T>;

@@ -13,7 +13,7 @@ describe('trip costs', () => {
   it('a new game starts with a little money and costs rise by zone', () => {
     expect(initialState().money).toBe(START_MONEY);
     const costs = ZONE_IDS.map((z) => tripCostFor(z));
-    expect(costs).toEqual([3, 20, 58, 270]);
+    expect(costs).toEqual([3, 20, 58, 270, 360, 500, 690, 940]);
     expect(costs.every((c, i) => i === 0 || c > costs[i - 1])).toBe(true);
   });
 
@@ -21,7 +21,7 @@ describe('trip costs', () => {
     const b = initialState().boats[0];
     b.hull = 3;
     b.hold = 3; // 12 crates
-    expect(ZONE_IDS.map((z) => tripCostFor(z, b))).toEqual([7, 52, 154, 750]);
+    expect(ZONE_IDS.map((z) => tripCostFor(z, b))).toEqual([7, 52, 154, 750, 960, 1300, 1770, 2380]);
     expect(tripCostFor('shallows', initialState().boats[0])).toBe(ZONES.shallows.tripCost + ZONES.shallows.crateCost * 4);
   });
 
@@ -80,7 +80,7 @@ describe('trip costs', () => {
     delete raw.stats.tripCosts;
     const mem = new Map<string, string>([['harbour-game-save', JSON.stringify(raw)]]);
     const l = loadGame({ getItem: (k) => mem.get(k) ?? null, setItem: (k, v) => void mem.set(k, v), removeItem: (k) => void mem.delete(k) }, new Rng(1))!;
-    expect(l.version).toBe(10);
+    expect(l.version).toBe(11);
     expect(l.stats.tripCosts).toBe(0);
   });
 });

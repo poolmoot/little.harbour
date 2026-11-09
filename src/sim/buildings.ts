@@ -1,4 +1,5 @@
 import {
+  REST_PAY_MAX,
   BUILDINGS, FISH_PRICE, RESTAURANT_CAPACITY, RESTAURANT_MULT, RESTAURANT_VARIETY_BONUS,
   SMOKE_RACKS, SMOKE_SECONDS, SPECIES,
 } from './config';
@@ -108,7 +109,7 @@ export const restaurantRoom = (state: GameState): number => restaurantCapacity(s
 /** What the restaurant pays for this crate right now (ignores the market price level). */
 export function restaurantPrice(state: GameState, c: Crate): number {
   const kindsBefore = state.restaurant.kinds.filter((k) => k !== c.species).length;
-  return Math.round(FISH_PRICE[c.species] * RESTAURANT_MULT * (1 + RESTAURANT_VARIETY_BONUS * kindsBefore) * restaurantTownMult(state) * saleTownMult(state) * restKitchenMult(state));
+  return Math.min(REST_PAY_MAX, Math.round(FISH_PRICE[c.species] * RESTAURANT_MULT * (1 + RESTAURANT_VARIETY_BONUS * kindsBefore) * restaurantTownMult(state) * saleTownMult(state) * restKitchenMult(state)));
 }
 
 /** Would the restaurant buy this crate today? */

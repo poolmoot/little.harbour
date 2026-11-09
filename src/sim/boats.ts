@@ -1,4 +1,4 @@
-import { KING_CHANCE, KING_MULT_MAX, LIGHTHOUSE_NIGHT_TRIP_MULT, STORM_CATCH_MULT, STORM_DAMAGE_CHANCE } from './config';
+import { KING_CHANCE, KING_DEPTH_BONUS, KING_FROM_ZONE, KING_MULT_MAX, ZONE_IDS, LIGHTHOUSE_NIGHT_TRIP_MULT, STORM_CATCH_MULT, STORM_DAMAGE_CHANCE } from './config';
 import type { Species, ZoneId } from './config';
 import { rollCatch } from './catch';
 import { midSize, recordCatch, rollFish } from './fishbook';
@@ -85,7 +85,8 @@ function returnBoat(state: GameState, boat: Boat, rng: Rng): Ev[] {
     evs.push(...recordBoatCatch(state, boat));
     if (stormTrip) state.tally.storm += 1;
     // The King Fish: a night trip to the Deep Sea with the lighthouse lit.
-    if (zone === 'deep' && boat.nightTrip && state.buildings.lighthouse > 0 && !state.king.found && rng.next() < KING_CHANCE * Math.min(KING_MULT_MAX, rareMult(boat))) {
+    const depth = ZONE_IDS.indexOf(zone) - ZONE_IDS.indexOf(KING_FROM_ZONE);
+    if (depth >= 0 && boat.nightTrip && state.buildings.lighthouse > 0 && !state.king.found && rng.next() < KING_CHANCE * Math.min(KING_MULT_MAX, rareMult(boat)) * (1 + KING_DEPTH_BONUS * depth)) {
       boat.king = true;
       state.king.found = true;
       state.king.day = state.day;

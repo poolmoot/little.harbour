@@ -3,15 +3,20 @@
 export const SPECIES = [
   'herring', 'mackerel', 'flounder', 'seabass', 'snapper', 'lobster',
   'cod', 'tuna', 'swordfish', 'anglerfish', 'squid', 'sturgeon',
+  'halibut', 'kingcrab', 'icefish', 'lanternfish', 'gulpereel', 'oarfish',
+  'ghostshark', 'coelacanth', 'pearloyster', 'dragonfish', 'frilledshark', 'seaserpent',
 ] as const;
 export type Species = (typeof SPECIES)[number];
-export type ZoneId = 'shallows' | 'reef' | 'opensea' | 'deep';
+export type ZoneId = 'shallows' | 'reef' | 'opensea' | 'deep' | 'north' | 'dark' | 'wreck' | 'trench';
 export type Phase = 'dawn' | 'day' | 'dusk' | 'night';
 export type UpgradeId = 'handcart' | 'bigcart' | 'wagon' | 'steamwagon' | 'stall1' | 'stall2';
 
 export const FISH_PRICE: Record<Species, number> = {
   herring: 6, mackerel: 10, flounder: 18, seabass: 28, snapper: 40, lobster: 90,
   cod: 60, tuna: 110, swordfish: 220, anglerfish: 160, squid: 260, sturgeon: 800,
+  // the deeper places for the big ships: each place is about 1.35 times the one before per crate
+  halibut: 260, kingcrab: 390, icefish: 820, lanternfish: 355, gulpereel: 530, oarfish: 1120,
+  ghostshark: 480, coelacanth: 720, pearloyster: 1500, dragonfish: 650, frilledshark: 970, seaserpent: 2050,
 };
 
 /** trip = seconds at sea. tripCost + crateCost x hold size = food, supplies and ice, paid when the boat leaves. needsHull = minimum hull tier (0 Rowboat .. 3 Trawler). */
@@ -20,8 +25,16 @@ export const ZONES: Record<ZoneId, { trip: number; tripCost: number; crateCost: 
   reef: { trip: 65, tripCost: 4, crateCost: 4, needsHull: 1, table: { seabass: 50, snapper: 35, lobster: 15 } },
   opensea: { trip: 105, tripCost: 10, crateCost: 12, needsHull: 2, table: { cod: 50, tuna: 35, swordfish: 15 } },
   deep: { trip: 155, tripCost: 30, crateCost: 60, needsHull: 3, table: { anglerfish: 50, squid: 35, sturgeon: 15 } },
+  north: { trip: 190, tripCost: 60, crateCost: 75, needsHull: 4, table: { halibut: 50, kingcrab: 35, icefish: 15 } },
+  dark: { trip: 230, tripCost: 100, crateCost: 100, needsHull: 6, table: { lanternfish: 50, gulpereel: 35, oarfish: 15 } },
+  wreck: { trip: 280, tripCost: 150, crateCost: 135, needsHull: 8, table: { ghostshark: 50, coelacanth: 35, pearloyster: 15 } },
+  trench: { trip: 340, tripCost: 220, crateCost: 180, needsHull: 9, table: { dragonfish: 50, frilledshark: 35, seaserpent: 15 } },
 };
-export const ZONE_IDS: ZoneId[] = ['shallows', 'reef', 'opensea', 'deep'];
+export const ZONE_IDS: ZoneId[] = ['shallows', 'reef', 'opensea', 'deep', 'north', 'dark', 'wreck', 'trench'];
+/** The King Fish can be caught at night in the Deep Sea or any place deeper than it. */
+export const KING_FROM_ZONE: ZoneId = 'deep';
+/** Each place deeper than the Deep Sea makes the King Fish this much more likely (trips there are longer, so there are fewer of them). */
+export const KING_DEPTH_BONUS = 0.35;
 
 export const PIER_TABLE: Partial<Record<Species, number>> = { herring: 70, mackerel: 30 };
 export const FLOUNDER_TWILIGHT_MULT = 3;
@@ -107,7 +120,7 @@ export const MAX_BOATS = 4;
 export const BOAT_NAMES = ['Gull', 'Wren', 'Marigold', 'Albatross'];
 /** Cost to reach level i of each track (index 0 unused). Hold, Gear and Sails are multiplied by TIER_COST_MULT[hull]. */
 export const TRACK_COST: Record<Track, number[]> = {
-  hull: [0, 400, 2500, 4500, 60000, 200000, 500000, 1200000, 3000000, 7500000],
+  hull: [0, 400, 2500, 4500, 60000, 200000, 500000, 650000, 1200000, 2200000],
   hold: [0, 110, 450, 1200, 3000, 8000, 20000],
   gear: [0, 350, 950, 3000, 9000],
   sails: [0, 350, 800, 2500, 8000],
@@ -296,6 +309,8 @@ export const REST_KITCHEN_MULT = [1, 1.15, 1.3, 1.5, 1.75, 2];
 export const REST_WAITERS_MIN_FRESH = [RESTAURANT_MIN_FRESH, 70, 60, 50, 40, 30];
 /** Decoration: drinks money each morning. */
 export const REST_DECOR_INCOME = [0, 300, 800, 2000, 5000, 12000];
+/** The most the restaurant pays for one fish, so rare deep fish still go to the market. */
+export const REST_PAY_MAX = 5000;
 export const RESTAURANT_VARIETY_BONUS = 0.1;
 
 // ---- Weather and special days ----------------------------------------------
@@ -304,7 +319,7 @@ export const WEATHER_IDS: WeatherId[] = ['calm', 'wind', 'fog', 'storm'];
 export const WEATHER_CHANCE: Record<WeatherId, number> = { calm: 45, wind: 20, fog: 20, storm: 15 };
 export const WEATHER_TRIP_MULT: Record<WeatherId, number> = { calm: 1, wind: 0.8, fog: 1.25, storm: 1 };
 export const STORM_FIRST_DAY = 4;
-export const STORM_ZONES: ZoneId[] = ['opensea', 'deep'];
+export const STORM_ZONES: ZoneId[] = ['opensea', 'deep', 'north', 'dark', 'wreck', 'trench'];
 export const STORM_CATCH_MULT = 1.5;
 export const STORM_DAMAGE_CHANCE = 0.25;
 export const REPAIR_SECONDS = 60;
@@ -352,7 +367,7 @@ export const BANDSTAND_GOLDEN_MULT = 2; // golden fish more common
 export const STATUE_SALE_MULT = 1.05; // every sale pays more
 
 // ---- King Fish and the money-per-minute figure ----------------------------------
-export const KING_CHANCE = 0.018;
+export const KING_CHANCE = 0.025;
 /** The King Fish chance grows with Nets and a Lucky or experienced captain, but never past this (the old best: Nets 2.2 x Lucky 1.25), so the extra Nets levels do not rush the ending. */
 export const KING_MULT_MAX = 2.75;
 export const RATE_SAMPLE_SECONDS = 5;
@@ -370,6 +385,8 @@ export const NAME_PATTERN = /^[\p{L}\p{N} '.,!&-]+$/u;
 export const FISH_SIZE: Record<Species, [number, number]> = {
   herring: [15, 30], mackerel: [20, 45], flounder: [25, 50], seabass: [30, 80], snapper: [30, 90], lobster: [20, 50],
   cod: [40, 120], tuna: [80, 250], swordfish: [150, 450], anglerfish: [30, 100], squid: [30, 120], sturgeon: [100, 300],
+  halibut: [60, 200], kingcrab: [30, 90], icefish: [25, 60], lanternfish: [5, 15], gulpereel: [50, 180], oarfish: [300, 800],
+  ghostshark: [60, 150], coelacanth: [120, 200], pearloyster: [10, 30], dragonfish: [10, 40], frilledshark: [100, 200], seaserpent: [500, 1500],
 };
 /** Price change for the smallest and the biggest fish; a middle-sized fish pays the normal price. */
 export const SIZE_PRICE_MIN = -0.1;
@@ -381,8 +398,8 @@ export const GOLDEN_CHANCE = 0.02; // per crate, before Nets and a Lucky captain
 export const GOLDEN_CHANCE_MAX = 0.2;
 export const GOLDEN_MULT = 5;
 /** One-time cash rewards per zone: every fish of the zone caught, and 3 stars on every fish of the zone. */
-export const BOOK_REWARD_CAUGHT: Record<ZoneId, number> = { shallows: 25, reef: 75, opensea: 200, deep: 500 };
-export const BOOK_REWARD_STARS: Record<ZoneId, number> = { shallows: 100, reef: 300, opensea: 800, deep: 2000 };
+export const BOOK_REWARD_CAUGHT: Record<ZoneId, number> = { shallows: 25, reef: 75, opensea: 200, deep: 500, north: 1000, dark: 2000, wreck: 3500, trench: 6000 };
+export const BOOK_REWARD_STARS: Record<ZoneId, number> = { shallows: 100, reef: 300, opensea: 800, deep: 2000, north: 3000, dark: 6000, wreck: 10000, trench: 18000 };
 
 // ---- Earnings while away ---------------------------------------------------------
 export const AWAY_MIN_SECONDS = 60; // shorter absences are ignored

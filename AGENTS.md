@@ -113,7 +113,7 @@ See "Code map" at the bottom for a file-by-file list.
    `view/textures.ts`, the panel code) before writing new ones.
 5. Changing the saved-state shape needs a version bump and a migration in
    `src/sim/save.ts`, with a test that an old save still loads. (Now at
-   version 10; version 10 added the restaurant upgrades and the drinks line; version 9 added the Big Cart, Horse Wagon and Steam Wagon; version 8 added town projects, captain trips and the boat-care line; version 7 removed the ice box and cold store; version 3 added the day report's trip-cost line; version 4 the
+   version 11; version 11 added four deeper places and twelve new fish; version 10 added the restaurant upgrades and the drinks line; version 9 added the Big Cart, Horse Wagon and Steam Wagon; version 8 added town projects, captain trips and the boat-care line; version 7 removed the ice box and cold store; version 3 added the day report's trip-cost line; version 4 the
    tycoon stage (buildings, weather, contracts, goals, King Fish); version 5
    fish sizes, golden fish, names and earnings while away; version 6 the
    starting guide; version 7 removed the ice box and the cold store: stored crates go back
@@ -164,6 +164,7 @@ stepping on each other:
   mended road, a new fish-hall roof, painted houses, bunting on a fair ground, a
   rebuilt sea wall, a sailing school sign, a bandstand, a statue. Rules work
   without it.
+- Twelve new deep fish (halibut .. sea serpent) use plain crate colours in `palette.ts`; nicer fish icons and a sense of the deeper places (darker water far out) are welcome.
 - A small level badge for experienced captains (`captainLevel` in `sim/captains.ts`).
 - Dock crates in bins (`DOCK_BIN_SIZE` in `config.ts`): the gameplay agent drew a plain version in
   `view/cratesView.ts` (one crate per dock spot of up to 8: wood, wood with steel bands, steel,
@@ -214,6 +215,8 @@ In `docs/superpowers/specs/`, oldest first:
    upgrade levels, prices shown in money, the easier start and the bigger dock crates.
 8. `2026-10-28-restaurant-and-big-ships-design.md` — dearer carts and ships, boat sizes up
    to 9, the restaurant's four upgrades and its live 3D room.
+9. `2026-11-09-deeper-places-design.md` — four deeper places for the big ships (Cold North
+   Sea, Dark Deep, Sunken Wreck, The Trench), twelve new fish, the King Fish deeper too.
 
 Where they disagree, the newer one wins. Write a short spec like these
 before building any large new feature, and keep the cost tables in the spec

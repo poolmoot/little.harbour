@@ -13,6 +13,18 @@ export const SPECIES_COLOUR: Record<Species, number> = {
   anglerfish: 0x4a3a5a,
   squid: 0xc9585f,
   sturgeon: 0xf2c14e,
+  halibut: 0xbfae94,
+  kingcrab: 0xd8452f,
+  icefish: 0xd6f0f7,
+  lanternfish: 0x2f3a6a,
+  gulpereel: 0x3d2f4a,
+  oarfish: 0xd9dde6,
+  ghostshark: 0x9fa9b8,
+  coelacanth: 0x34506a,
+  pearloyster: 0xf3ead8,
+  dragonfish: 0x1f2433,
+  frilledshark: 0x5f5a54,
+  seaserpent: 0x2f8a6a,
 };
 
 export const hex = (n: number): string => '#' + n.toString(16).padStart(6, '0');

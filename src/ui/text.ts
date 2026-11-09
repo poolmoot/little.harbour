@@ -18,9 +18,11 @@ export const crates = (n: number): string => plural(n, 'crate');
 export const FISH_NAME: Record<Species, string> = {
   herring: 'Herring', mackerel: 'Mackerel', flounder: 'Flounder', seabass: 'Sea bass', snapper: 'Red snapper', lobster: 'Lobster',
   cod: 'Cod', tuna: 'Tuna', swordfish: 'Swordfish', anglerfish: 'Anglerfish', squid: 'Giant squid', sturgeon: 'Golden sturgeon',
+  halibut: 'Halibut', kingcrab: 'King crab', icefish: 'Ice fish', lanternfish: 'Lanternfish', gulpereel: 'Gulper eel', oarfish: 'Oarfish',
+  ghostshark: 'Ghost shark', coelacanth: 'Coelacanth', pearloyster: 'Pearl oyster', dragonfish: 'Dragonfish', frilledshark: 'Frilled shark', seaserpent: 'Sea serpent',
 };
 
-export const ZONE_NAME: Record<ZoneId, string> = { shallows: 'Shallow Water', reef: 'Coral Reef', opensea: 'Open Sea', deep: 'Deep Sea' };
+export const ZONE_NAME: Record<ZoneId, string> = { shallows: 'Shallow Water', reef: 'Coral Reef', opensea: 'Open Sea', deep: 'Deep Sea', north: 'Cold North Sea', dark: 'Dark Deep', wreck: 'Sunken Wreck', trench: 'The Trench' };
 
 export const PHASE_NAME: Record<Phase, string> = { dawn: 'Morning', day: 'Day', dusk: 'Evening', night: 'Night' };
 
@@ -63,6 +65,9 @@ export const NPC_TITLE = { fishmonger: 'Greta, fish seller', shipwright: 'Osric,
 // ---- boat upgrade texts -----------------------------------------------------
 
 /** What a boat has now on a track. */
+/** The farthest place a boat of this size can fish. */
+const farthestZone = (hull: number): ZoneId => [...ZONE_IDS].reverse().find((z) => ZONES[z].needsHull <= hull) ?? ZONE_IDS[0];
+
 /** Seconds a trip to the boat's chosen place takes at a Speed level (before captains and weather). */
 const tripSecs = (b: Boat, sails: number): number => Math.round(ZONES[b.target].trip * SAILS_MULT[sails]);
 
@@ -75,7 +80,7 @@ function dollars(share: number): string {
 export function trackNow(b: Boat, t: Track): string {
   const l = b[t];
   switch (t) {
-    case 'hull': return `${boatType(l)}, fishes as far as ${ZONE_NAME[ZONE_IDS[Math.min(l, ZONE_IDS.length - 1)]]}`;
+    case 'hull': return `${boatType(l)}, fishes as far as ${ZONE_NAME[farthestZone(l)]}`;
     case 'hold': return `Brings home ${crates(HOLD_SIZES[l])}`;
     case 'gear': return l === 0 ? 'Normal nets' : `Catches ${GEAR_MULT[l]}× as many expensive fish`;
     case 'sails': return `A trip takes ${tripSecs(b, l)} seconds`;
@@ -86,9 +91,12 @@ export function trackNow(b: Boat, t: Track): string {
 export function trackNext(b: Boat, t: Track): string {
   const l = b[t];
   switch (t) {
-    case 'hull': return l + 1 < ZONE_IDS.length
-      ? `${boatType(l + 1)}: can go to ${ZONE_NAME[ZONE_IDS[l + 1]]}, where fish are worth more`
-      : `${boatType(l + 1)}: brings home ${HULL_EXTRA_CRATES[l + 1] - HULL_EXTRA_CRATES[l]} more crates each trip`;
+    case 'hull': {
+      const opens = ZONE_IDS.find((z) => ZONES[z].needsHull === l + 1);
+      return opens
+        ? `${boatType(l + 1)}: can go to ${ZONE_NAME[opens]}, where fish are worth more`
+        : `${boatType(l + 1)}: brings home ${HULL_EXTRA_CRATES[l + 1] - HULL_EXTRA_CRATES[l]} more crates each trip`;
+    }
     case 'hold': return `Brings home ${HOLD_SIZES[l + 1]} crates (${HOLD_SIZES[l + 1] - HOLD_SIZES[l]} more each trip)`;
     case 'gear': return `Catches ${GEAR_MULT[l + 1]}× as many expensive fish`;
     case 'sails': return `A trip takes ${tripSecs(b, l + 1)} seconds (${tripSecs(b, l) - tripSecs(b, l + 1)} seconds faster)`;
